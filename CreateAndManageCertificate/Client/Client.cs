@@ -7,6 +7,7 @@ using CommunicationContract;
 using System.ServiceModel;
 using System.ServiceModel.Security;
 using System.Security.Cryptography.X509Certificates;
+using System.IdentityModel.Tokens;
 
 namespace Client
 {
@@ -14,19 +15,41 @@ namespace Client
     {
 
         IContract factory;
-        public Client(NetTcpBinding binding, EndpointAddress address)
+        public Client(NetTcpBinding binding, EndpointAddress address, string validationType)
             : base(binding, address)
         {
-            this.Credentials.ServiceCertificate.Authentication.RevocationMode = X509RevocationMode.NoCheck;
-            this.Credentials.ClientCertificate.SetCertificate("CN=client", StoreLocation.LocalMachine, StoreName.My);
-            this.Credentials.ServiceCertificate.Authentication.CertificateValidationMode = X509CertificateValidationMode.ChainTrust;
-            //this.Credentials.ServiceCertificate.Authentication.CustomCertificateValidator = new CustomValidator();
-            factory = this.CreateChannel();
+            if (validationType.Equals("chain"))
+            {
+                this.Credentials.ServiceCertificate.Authentication.RevocationMode = X509RevocationMode.NoCheck;
+                this.Credentials.ClientCertificate.SetCertificate("CN=client", StoreLocation.LocalMachine, StoreName.My);
+                this.Credentials.ServiceCertificate.Authentication.CertificateValidationMode = X509CertificateValidationMode.ChainTrust;
+                //this.Credentials.ServiceCertificate.Authentication.CustomCertificateValidator = new CustomValidator();
+                factory = this.CreateChannel();
+            }
+            else
+            {
+                this.Credentials.ServiceCertificate.Authentication.RevocationMode = X509RevocationMode.NoCheck;
+                this.Credentials.ClientCertificate.SetCertificate("CN=custom", StoreLocation.LocalMachine, StoreName.My);
+                this.Credentials.ServiceCertificate.Authentication.CertificateValidationMode = X509CertificateValidationMode.Custom;
+                this.Credentials.ServiceCertificate.Authentication.CustomCertificateValidator = new CustomValidator();
+                factory = this.CreateChannel();
+            }
         }
 
         public void PingServer(TimeSpan t)
         {
-            factory.PingServer(t);
+            try
+            {
+                factory.PingServer(t);
+            }
+            catch (SecurityTokenValidationException e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
         }
     }
 }

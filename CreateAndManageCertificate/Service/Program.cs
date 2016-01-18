@@ -29,8 +29,20 @@ namespace Service
             host.Credentials.ClientCertificate.Authentication.RevocationMode = X509RevocationMode.NoCheck;
             host.AddServiceEndpoint(typeof(IContract), binding, address);
             host.Credentials.ServiceCertificate.SetCertificate("CN=srv", StoreLocation.LocalMachine, StoreName.My);
-
             host.Open();
+
+            NetTcpBinding bindingForCustomValidation = new NetTcpBinding(SecurityMode.Transport);
+            string addressForCustomValidation = "net.tcp://localhost:10000/WCFService";
+            bindingForCustomValidation.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
+
+            ServiceHost hostForCustomValidation = new ServiceHost(typeof(Service));
+            hostForCustomValidation.Credentials.ClientCertificate.Authentication.CertificateValidationMode = X509CertificateValidationMode.Custom;
+            hostForCustomValidation.Credentials.ClientCertificate.Authentication.CustomCertificateValidator = new CustomValidator();
+            hostForCustomValidation.Credentials.ClientCertificate.Authentication.RevocationMode = X509RevocationMode.NoCheck;
+            hostForCustomValidation.AddServiceEndpoint(typeof(IContract), bindingForCustomValidation, addressForCustomValidation);
+            hostForCustomValidation.Credentials.ServiceCertificate.SetCertificate("CN=srv", StoreLocation.LocalMachine, StoreName.My);
+            hostForCustomValidation.Open();
+
             Console.WriteLine("WCFService is opened. Press <enter> to finish...");
             Console.ReadLine();
 

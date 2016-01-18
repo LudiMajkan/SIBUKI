@@ -15,6 +15,8 @@ namespace CreateAndManageCertificate
         static void Main(string[] args)
         {
 
+            InitializeCertificateList.ImportCertificates();
+
             NetTcpBinding binding = new NetTcpBinding(SecurityMode.Transport);
             string address = "net.tcp://localhost:27016/CreateAndManageCertificateServiceContract";
             ServiceHost host = new ServiceHost(typeof(CreateAndManageCertificateServiceContract));

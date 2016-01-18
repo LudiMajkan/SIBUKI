@@ -64,6 +64,7 @@ namespace CreateAndManageCertificate
                 }
                 p.WaitForExit();
                 certificates.Add(MakeCert.CreateCertObj(Directory.GetParent(Directory.GetParent(Directory.GetCurrentDirectory()).ToString()) + @"\" + cerAndpvkName + ".cer", null));
+                InitializeCertificateList.WriteCertificatePathAndPassword(Directory.GetParent(Directory.GetParent(Directory.GetCurrentDirectory()).ToString()) + @"\" + cerAndpvkName + ".cer", "");
             }
         }
 
@@ -116,6 +117,7 @@ namespace CreateAndManageCertificate
             }
             p.WaitForExit();
             certificates.Add(MakeCert.CreateCertObj(Directory.GetParent(Directory.GetParent(Directory.GetCurrentDirectory()).ToString()) + @"\" + namePvkAndCer + ".pfx", pass));
+            InitializeCertificateList.WriteCertificatePathAndPassword(Directory.GetParent(Directory.GetParent(Directory.GetCurrentDirectory()).ToString()) + @"\" + namePvkAndCer + ".pfx", pass);
         }
 
         public static void InstallCert(X509Certificate2 cert = null, string name = null, bool hasPrivateKey = true)
@@ -189,11 +191,24 @@ namespace CreateAndManageCertificate
         {
             foreach (X509Certificate2 cert in certificates)
             {
-                if (cert.SubjectName.Name.Equals("CN=" + name))
+                if (name.Contains("CN="))
                 {
-                    if (cert.HasPrivateKey.Equals(hasPrivateKey))
+                    if (cert.SubjectName.Name.Equals(name))
                     {
-                        return cert;
+                        if (cert.HasPrivateKey.Equals(hasPrivateKey))
+                        {
+                            return cert;
+                        }
+                    }
+                }
+                else
+                {
+                    if (cert.SubjectName.Name.Equals("CN=" + name))
+                    {
+                        if (cert.HasPrivateKey.Equals(hasPrivateKey))
+                        {
+                            return cert;
+                        }
                     }
                 }
             }

@@ -17,9 +17,8 @@ namespace Service
             currID++;
             TimeSpan now = DateTime.Now.TimeOfDay;
             string[] lines = { currID + " : " + now.ToString() + " : " + t.ToString()};
-            //System.IO.File.WriteAllLines(Directory.GetParent(Directory.GetParent(Directory.GetCurrentDirectory()).ToString()).ToString() + "\\textFile.txt", lines);
             System.IO.File.AppendAllLines(Directory.GetParent(Directory.GetParent(Directory.GetCurrentDirectory()).ToString()).ToString() + "\\textFile.txt", lines);
-            Console.WriteLine("Service pinged me.");
+            Console.WriteLine("Client pinged me.");
         }
     }
 }

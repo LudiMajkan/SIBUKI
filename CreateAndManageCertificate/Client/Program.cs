@@ -68,16 +68,31 @@ namespace Client
                 
             }*/
             bool exit = false;
+            Console.WriteLine("Enter validation type! (custom/chain)");
+            string validationType = Console.ReadLine();
             System.Threading.Thread exitThread = new System.Threading.Thread(() => { exit = ExitThreadMethod(); });
             exitThread.Start();
             NetTcpBinding binding = new NetTcpBinding();
             binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
-            string address = "net.tcp://localhost:9999/WCFService";
+            string address = "";
+            if (validationType.Equals("chain"))
+            {
+                address = "net.tcp://localhost:9999/WCFService";
+            }
+            else
+            {
+                address = "net.tcp://localhost:10000/WCFService";
+            }
             EndpointAddress epa = new EndpointAddress(new Uri(address));
+            X509Store store = new X509Store(StoreName.TrustedPeople, StoreLocation.LocalMachine);
+            store.Open(OpenFlags.ReadOnly);
 
+            X509Certificate2Collection collection = store.Certificates.Find(X509FindType.FindBySubjectName, "srv", true);
+            X509Certificate2 cert = collection[0];
             Console.WriteLine("Client started.\nPress \'e\' to exit.");
             using (Client proxy = new Client(binding, new EndpointAddress(new Uri(address),new X509CertificateEndpointIdentity(
-                                  new X509Certificate2(Directory.GetParent(Directory.GetParent(Directory.GetParent(Directory.GetCurrentDirectory()).ToString()).ToString()) + @"\CreateAndManageCertificate\srv.cer")))))
+                                  //new X509Certificate2(Directory.GetParent(Directory.GetParent(Directory.GetParent(Directory.GetCurrentDirectory()).ToString()).ToString()) + @"\CreateAndManageCertificate\srv.cer")))
+                                  cert)), validationType))
             {
                 Random rnd = new Random();
                 int sleepInterval = 0;
@@ -88,6 +103,7 @@ namespace Client
                     proxy.PingServer(DateTime.Now.TimeOfDay);
                 }
             }
+            store.Close();
         }
     }
 }
