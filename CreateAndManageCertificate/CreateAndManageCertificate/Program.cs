@@ -37,7 +37,8 @@ namespace CreateAndManageCertificate
                 Console.WriteLine("4. Create and install certificate");
                 Console.WriteLine("5. Grant access to the private key");
                 Console.WriteLine("6. Deny access to the private key");
-                Console.WriteLine("7. Exit our precious application. :(");
+                Console.WriteLine("7. Revoke certificate");
+                Console.WriteLine("8. Exit our precious application. :(");
                 string option = Console.ReadLine();
 
                 switch (option)
@@ -72,6 +73,11 @@ namespace CreateAndManageCertificate
                         MakeCert.DenyRights();
                         break;
                     case "7":
+                        Console.WriteLine("Enter name for certificate that you want to revoke");
+                        string nameForRevocation = Console.ReadLine();
+                        MakeCert.RevokeCert(nameForRevocation);
+                        break;
+                    case "8":
                         shouldIExitApp = true;
                         break;
                     default:

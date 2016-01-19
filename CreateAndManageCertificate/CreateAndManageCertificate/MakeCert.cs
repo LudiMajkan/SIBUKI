@@ -330,5 +330,44 @@ namespace CreateAndManageCertificate
             }
             p.WaitForExit();
         }
+        public static void RevokeCert(string name)
+        {
+            X509Certificate2 certWithoutPrivateKey = FindCertByName(name, false);
+            X509Certificate2 certWithPrivateKey = FindCertByName(name, true);
+            revocationList.Add(certWithoutPrivateKey);
+            revocationList.Add(certWithPrivateKey);
+            certificates.Remove(certWithoutPrivateKey);
+            certificates.Remove(certWithPrivateKey);
+            string[] strs = new string[certificates.Count];
+            string[] strsFromFile = System.IO.File.ReadAllLines(Directory.GetParent(Directory.GetParent(Directory.GetParent(Directory.GetCurrentDirectory()).ToString()).ToString())
+                + @"\CreateAndManageCertificate\CertiicatePathsAndPasswords.txt");
+            int writeTostrs = 0;
+            for(int i = 0; i < certificates.Count + 2; i++)
+            {
+                if(!strsFromFile[i].Contains(name + ".cer") && !strsFromFile[i].Contains(name + ".pfx"))
+                {
+                    strs[writeTostrs] = strsFromFile[i];
+                    writeTostrs++;
+                }
+                else
+                {
+                    if(File.Exists(strsFromFile[i].Split(',')[0]))
+                    {
+                        File.Delete(strsFromFile[i].Split(',')[0]);
+                        if(strsFromFile[i].Contains(name + ".cer"))
+                        {
+                            File.Delete(strsFromFile[i].Split(',')[0].Replace(name + ".cer", name + ".pvk"));
+                        }
+                        else if(strsFromFile[i].Contains(name + ".pfx"))
+                        {
+                            File.Delete(strsFromFile[i].Split(',')[0].Replace(name + ".pfx", name + ".pvk"));
+                        }
+                    }
+                }
+            }
+            System.IO.File.WriteAllLines(Directory.GetParent(Directory.GetParent(Directory.GetParent(Directory.GetCurrentDirectory()).ToString()).ToString())
+                + @"\CreateAndManageCertificate\CertiicatePathsAndPasswords.txt", strs);
+        }
     }
 }
+

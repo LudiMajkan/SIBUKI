@@ -15,14 +15,17 @@ namespace CreateAndManageCertificate
                 + @"\CreateAndManageCertificate\CertiicatePathsAndPasswords.txt");
             foreach(string line in lines)
             {
-                string[] splittedLine = line.Split(',');
-                if (splittedLine[1].Equals(""))
+                if (!line.Equals(""))
                 {
-                    MakeCert.certificates.Add(new X509Certificate2(splittedLine[0]));
-                }
-                else
-                {
-                    MakeCert.certificates.Add(new X509Certificate2(splittedLine[0], splittedLine[1]));
+                    string[] splittedLine = line.Split(',');
+                    if (splittedLine[1].Equals(""))
+                    {
+                        MakeCert.certificates.Add(new X509Certificate2(splittedLine[0]));
+                    }
+                    else
+                    {
+                        MakeCert.certificates.Add(new X509Certificate2(splittedLine[0], splittedLine[1]));
+                    }
                 }
             }
         }
