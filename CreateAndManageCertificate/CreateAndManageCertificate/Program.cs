@@ -33,8 +33,8 @@ namespace CreateAndManageCertificate
                 Console.WriteLine("Choose an option:");
                 Console.WriteLine("1. Create certificate .cer and .pvk files");
                 Console.WriteLine("2. Create certificate .pfx file");
-                Console.WriteLine("3. Install certificate");
-                Console.WriteLine("4. Create and install certificate");
+                Console.WriteLine("3. Install certificate (BETA!)");
+                Console.WriteLine("4. Create and install certificate (BETA!)");
                 Console.WriteLine("5. Grant access to the private key");
                 Console.WriteLine("6. Deny access to the private key");
                 Console.WriteLine("7. Revoke certificate");
@@ -46,40 +46,52 @@ namespace CreateAndManageCertificate
                     case "1":
                         MakeCert.CreateCerts(1);
                         break;
+
                     case "2":
                         MakeCert.CreatePfxFile();
                         break;
+
                     case "3":
                         Console.WriteLine("Enter certificate name that you want to install");
                         string name = Console.ReadLine();
                         Console.WriteLine("Does certificate have private key? (Y/N)");
                         string hasPrivateKeyS = Console.ReadLine();
                         bool hasPrivateKey = false;
-                        if(hasPrivateKeyS.ToUpper().Equals("Y"))
-                        {
-                            hasPrivateKey = true;
-                        }
+                        hasPrivateKey = hasPrivateKeyS.ToUpper().Equals("Y");
+
                         MakeCert.InstallCert(null, name, hasPrivateKey);
+                        
                         break;
+
                     case "4":
                         MakeCert.CreateCerts(1);
                         MakeCert.CreatePfxFile();
                         MakeCert.InstallCert(MakeCert.certificates[MakeCert.certificates.Count - 1]);
+
                         break;
+
                     case "5":
                         MakeCert.GiveRights();
+
                         break;
+                    
                     case "6":
                         MakeCert.DenyRights();
+
                         break;
+                    
                     case "7":
                         Console.WriteLine("Enter name for certificate that you want to revoke");
                         string nameForRevocation = Console.ReadLine();
                         MakeCert.RevokeCert(nameForRevocation);
+
                         break;
+                    
                     case "8":
                         shouldIExitApp = true;
+
                         break;
+                    
                     default:
                         break;
                 }

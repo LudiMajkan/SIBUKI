@@ -42,3 +42,7 @@
 #debug
 bin/
 obj/
+
+#Other
+*/_UpgradeReport_Files/
+*/UpgradeLog.XML

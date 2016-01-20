@@ -113,18 +113,18 @@ namespace CreateAndManageCertificate
 
         public bool IsValid(X509Certificate2 certificate)
         {
-            if(certificate == null)
+            if (certificate == null)
             {
                 return false;
             }
-            if(certificate.NotAfter < DateTime.Now)
+            if (certificate.NotAfter < DateTime.Now)
             {
                 return false;
             }
 
             X509Certificate2 issuer = MakeCert.FindCertByName(certificate.IssuerName.Name, certificate.HasPrivateKey);
 
-            if(issuer == null)
+            if (issuer == null)
             {
                 return false;
             }

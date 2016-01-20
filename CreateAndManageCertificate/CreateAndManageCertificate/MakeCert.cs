@@ -5,13 +5,17 @@ using System.Text;
 using System.Diagnostics;
 using System.IO;
 using System.Security.Cryptography.X509Certificates;
+using CustomWindowsEventLogger;
 
 namespace CreateAndManageCertificate
 {
     public static class MakeCert
     {
+        private static CustomEventLogger logger = new CustomEventLogger();
+
         public static List<X509Certificate2> certificates = new List<X509Certificate2>();
         public static List<X509Certificate2> revocationList = new List<X509Certificate2>();
+
 
         /// <summary>
         /// Creates numOfCerts certificates.
@@ -22,7 +26,7 @@ namespace CreateAndManageCertificate
             for (int i = 0; i < numOfCerts; i++)
             {
                 Console.WriteLine("Enter name for .cer and .pvk files");
-                string cerAndpvkName = Console.ReadLine();
+                string cerAndPvkName = Console.ReadLine();
                 Console.WriteLine("Is certificate self signed? (Y/N)");
                 string isSelfSigned = Console.ReadLine();
                 string selfSigned = "";
@@ -41,8 +45,8 @@ namespace CreateAndManageCertificate
                     Console.WriteLine("Enter issuer .pvk file");
                     issuerPvkFileName = " -iv " + Console.ReadLine() + ".pvk";
                 }
-                string makecertCMD = "makecert.exe " + " -n \"CN=" + cerAndpvkName + "\" " + selfSigned + "-pe " + "-cy authority " + issuerCerFileName + issuerPvkFileName +
-                                     skyExchange + "-sv " + cerAndpvkName + ".pvk " + cerAndpvkName + ".cer";
+                string makecertCMD = "makecert.exe " + " -n \"CN=" + cerAndPvkName + "\" " + selfSigned + "-pe " + "-cy authority " + issuerCerFileName + issuerPvkFileName +
+                                     skyExchange + "-sv " + cerAndPvkName + ".pvk " + cerAndPvkName + ".cer";
                 Console.WriteLine(makecertCMD);
                 Process p = new Process();
                 ProcessStartInfo info = new ProcessStartInfo();
@@ -63,8 +67,11 @@ namespace CreateAndManageCertificate
                     }
                 }
                 p.WaitForExit();
-                certificates.Add(MakeCert.CreateCertObj(Directory.GetParent(Directory.GetParent(Directory.GetCurrentDirectory()).ToString()) + @"\" + cerAndpvkName + ".cer", null));
-                InitializeCertificateList.WriteCertificatePathAndPassword(Directory.GetParent(Directory.GetParent(Directory.GetCurrentDirectory()).ToString()) + @"\" + cerAndpvkName + ".cer", "");
+                certificates.Add(MakeCert.CreateCertObj(Directory.GetParent(Directory.GetParent(Directory.GetCurrentDirectory()).ToString()) + @"\" + cerAndPvkName + ".cer", null));
+                InitializeCertificateList.WriteCertificatePathAndPassword(Directory.GetParent(Directory.GetParent(Directory.GetCurrentDirectory()).ToString()) + @"\" + cerAndPvkName + ".cer", "");
+
+                string messageToLog = "Created " + cerAndPvkName + ".cer and " + cerAndPvkName + ".pvk files.";
+                logger.WriteToLog(messageToLog, EventLogEntryType.Information);
             }
         }
 
@@ -118,6 +125,9 @@ namespace CreateAndManageCertificate
             p.WaitForExit();
             certificates.Add(MakeCert.CreateCertObj(Directory.GetParent(Directory.GetParent(Directory.GetCurrentDirectory()).ToString()) + @"\" + namePvkAndCer + ".pfx", pass));
             InitializeCertificateList.WriteCertificatePathAndPassword(Directory.GetParent(Directory.GetParent(Directory.GetCurrentDirectory()).ToString()) + @"\" + namePvkAndCer + ".pfx", pass);
+
+            string messageToLog = "Created " + namePvkAndCer + ".pfx file.";
+            logger.WriteToLog(messageToLog, EventLogEntryType.Information);
         }
 
         public static void InstallCert(X509Certificate2 cert = null, string name = null, bool hasPrivateKey = true)
@@ -148,6 +158,9 @@ namespace CreateAndManageCertificate
                     store.Add(cert);
                     store.Close();
                 }
+
+                string messageToLog = "Installed certificate \"" + name + "\".";
+                logger.WriteToLog(messageToLog, EventLogEntryType.Information);
             }
             else if (name != null && cert == null)
             {
@@ -156,7 +169,7 @@ namespace CreateAndManageCertificate
                 {
                     if (!cert.Issuer.Equals(cert.SubjectName.Name))
                     {
-                        if(!cert.HasPrivateKey)
+                        if (!cert.HasPrivateKey)
                         {
                             X509Store store = new X509Store(StoreName.TrustedPeople, StoreLocation.LocalMachine);
                             store.Open(OpenFlags.ReadWrite);
@@ -170,7 +183,7 @@ namespace CreateAndManageCertificate
                             store.Add(cert);
                             store.Close();
                         }
-                        
+
                     }
                     else
                     {
@@ -179,10 +192,16 @@ namespace CreateAndManageCertificate
                         store.Add(cert);
                         store.Close();
                     }
+
+                    string messageToLog = "Installed certificate \"" + name + "\".";
+                    logger.WriteToLog(messageToLog, EventLogEntryType.Information);
                 }
                 else
                 {
-                    Console.WriteLine("Certificate with given name does not exist in evidence!");
+                    Console.WriteLine("Certificate with name \"" + name + "\" does not exist in evidence!");
+
+                    string messageToLog = "Certificate with name \"" + name + "\" does not exist in evidence!";
+                    logger.WriteToLog(messageToLog, EventLogEntryType.Information);
                 }
             }
         }
@@ -238,6 +257,9 @@ namespace CreateAndManageCertificate
             RemoveCert(cert);
             certificates.Remove(cert);
             revocationList.Add(cert);
+
+            string messageToLog = "Certificate " + cert.GetName() + "has been revoked.";
+            logger.WriteToLog(messageToLog, EventLogEntryType.Information);
         }
 
         public static X509Certificate2 CreateCertObj(string path, string password)
@@ -264,7 +286,7 @@ namespace CreateAndManageCertificate
             Console.WriteLine("Is certificate root or  personal? (R/P)");
             string certPlace = Console.ReadLine();
             string certPath = "My";
-            if(certPlace.ToUpper().Equals("R"))
+            if (certPlace.ToUpper().Equals("R"))
             {
                 certPath = "Root";
             }
@@ -286,11 +308,13 @@ namespace CreateAndManageCertificate
                     sw.WriteLine("cd..");
                     sw.WriteLine("cd..");
                     sw.WriteLine(grantAccessCommand);
-                    //sw.WriteLine("cls");
                     sw.WriteLine("exit");
                 }
             }
             p.WaitForExit();
+
+            string messageToLog = "Gave rights to account " + accName + " to manage " + certName + " certificate file.";
+            logger.WriteToLog(messageToLog, EventLogEntryType.Information);
         }
 
         public static void DenyRights()
@@ -329,6 +353,9 @@ namespace CreateAndManageCertificate
                 }
             }
             p.WaitForExit();
+
+            string messageToLog = "Denied rights to account " + accName + " to manage " + certName + " certificate file.";
+            logger.WriteToLog(messageToLog, EventLogEntryType.Information);
         }
         public static void RevokeCert(string name)
         {
@@ -342,23 +369,23 @@ namespace CreateAndManageCertificate
             string[] strsFromFile = System.IO.File.ReadAllLines(Directory.GetParent(Directory.GetParent(Directory.GetParent(Directory.GetCurrentDirectory()).ToString()).ToString())
                 + @"\CreateAndManageCertificate\CertiicatePathsAndPasswords.txt");
             int writeTostrs = 0;
-            for(int i = 0; i < certificates.Count + 2; i++)
+            for (int i = 0; i < certificates.Count + 2; i++)
             {
-                if(!strsFromFile[i].Contains(name + ".cer") && !strsFromFile[i].Contains(name + ".pfx"))
+                if (!strsFromFile[i].Contains(name + ".cer") && !strsFromFile[i].Contains(name + ".pfx"))
                 {
                     strs[writeTostrs] = strsFromFile[i];
                     writeTostrs++;
                 }
                 else
                 {
-                    if(File.Exists(strsFromFile[i].Split(',')[0]))
+                    if (File.Exists(strsFromFile[i].Split(',')[0]))
                     {
                         File.Delete(strsFromFile[i].Split(',')[0]);
-                        if(strsFromFile[i].Contains(name + ".cer"))
+                        if (strsFromFile[i].Contains(name + ".cer"))
                         {
                             File.Delete(strsFromFile[i].Split(',')[0].Replace(name + ".cer", name + ".pvk"));
                         }
-                        else if(strsFromFile[i].Contains(name + ".pfx"))
+                        else if (strsFromFile[i].Contains(name + ".pfx"))
                         {
                             File.Delete(strsFromFile[i].Split(',')[0].Replace(name + ".pfx", name + ".pvk"));
                         }

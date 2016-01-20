@@ -46,10 +46,26 @@ namespace Client
             {
                 Console.WriteLine(e.Message);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
             }
+        }
+        public void EstablishConnection()
+        {
+            try
+            {
+                factory.EstablishConnection();
+            }
+            catch (SecurityTokenValidationException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            
         }
     }
 }

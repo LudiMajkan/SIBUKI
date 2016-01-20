@@ -20,7 +20,7 @@ namespace Service
             EndpointAddress epaForValidateCertificate = new EndpointAddress(new Uri(addressForValidateCertificate));
             using (ValidationCertificateClientSide proxyForValidateCertificate = new ValidationCertificateClientSide(bindingForValidateCertificate, new EndpointAddress(new Uri(addressForValidateCertificate))))
             {
-                if(!proxyForValidateCertificate.IsValid(certificate))
+                if (!proxyForValidateCertificate.IsValid(certificate))
                 {
                     throw new SecurityTokenValidationException
                         ("Certificate is not valid");

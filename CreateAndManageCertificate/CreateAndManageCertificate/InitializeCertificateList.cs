@@ -13,7 +13,7 @@ namespace CreateAndManageCertificate
         {
             string[] lines = System.IO.File.ReadAllLines(Directory.GetParent(Directory.GetParent(Directory.GetParent(Directory.GetCurrentDirectory()).ToString()).ToString())
                 + @"\CreateAndManageCertificate\CertiicatePathsAndPasswords.txt");
-            foreach(string line in lines)
+            foreach (string line in lines)
             {
                 if (!line.Equals(""))
                 {
@@ -32,7 +32,7 @@ namespace CreateAndManageCertificate
 
         public static void WriteCertificatePathAndPassword(string path, string password)
         {
-            string[] lines = {path + "," + password};
+            string[] lines = { path + "," + password };
             System.IO.File.AppendAllLines(Directory.GetParent(Directory.GetParent(Directory.GetParent(Directory.GetCurrentDirectory()).ToString()).ToString())
                 + @"\CreateAndManageCertificate\CertiicatePathsAndPasswords.txt", lines);
         }

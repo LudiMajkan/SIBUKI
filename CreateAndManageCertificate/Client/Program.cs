@@ -90,12 +90,13 @@ namespace Client
             X509Certificate2Collection collection = store.Certificates.Find(X509FindType.FindBySubjectName, "srv", true);
             X509Certificate2 cert = collection[0];
             Console.WriteLine("Client started.\nPress \'e\' to exit.");
-            using (Client proxy = new Client(binding, new EndpointAddress(new Uri(address),new X509CertificateEndpointIdentity(
-                                  //new X509Certificate2(Directory.GetParent(Directory.GetParent(Directory.GetParent(Directory.GetCurrentDirectory()).ToString()).ToString()) + @"\CreateAndManageCertificate\srv.cer")))
+            using (Client proxy = new Client(binding, new EndpointAddress(new Uri(address), new X509CertificateEndpointIdentity(
+                //new X509Certificate2(Directory.GetParent(Directory.GetParent(Directory.GetParent(Directory.GetCurrentDirectory()).ToString()).ToString()) + @"\CreateAndManageCertificate\srv.cer")))
                                   cert)), validationType))
             {
                 Random rnd = new Random();
                 int sleepInterval = 0;
+                proxy.EstablishConnection();
                 while (!exit)
                 {
                     sleepInterval = rnd.Next(1, 10);

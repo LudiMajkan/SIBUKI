@@ -9,6 +9,10 @@ namespace CommunicationContract
     [ServiceContract]
     public interface IContract
     {
+
+        [OperationContract]
+        void EstablishConnection();
+
         [OperationContract]
         void PingServer(TimeSpan t);
     }

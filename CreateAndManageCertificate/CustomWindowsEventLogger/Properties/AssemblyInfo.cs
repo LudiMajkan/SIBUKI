@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("CreateAndManageCertificateServiceContract")]
+[assembly: AssemblyTitle("CustomWindowsEventLogger")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("CreateAndManageCertificateServiceContract")]
+[assembly: AssemblyProduct("CustomWindowsEventLogger")]
 [assembly: AssemblyCopyright("Copyright ©  2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("393e7803-0ff2-4914-9a76-0a958f0fdacf")]
+[assembly: Guid("8654a3ff-c116-4a85-8947-b82da21a3cf7")]
 
 // Version information for an assembly consists of the following four values:
 //
